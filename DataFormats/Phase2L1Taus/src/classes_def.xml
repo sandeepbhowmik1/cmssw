@@ -1,0 +1,17 @@
+<lcgdict>
+  <class name="l1t::L1HPSPFTau" ClassVersion="10">
+   <version ClassVersion="10" checksum="2335886114"/>
+  </class>
+  <class name="l1t::L1HPSPFTauCollection"/>
+  <class name="edm::Wrapper<l1t::L1HPSPFTauCollection>"/>
+  <class name="edm::Ref<l1t::L1HPSPFTauCollection>"/>
+  <class name="edm::RefVector<l1t::L1HPSPFTauCollection>"/>
+
+  <class name="l1t::L1HPSPFDiTau" ClassVersion="12">
+    <version ClassVersion="12" checksum="2675007476"/>
+  </class>
+  <class name="l1t::L1HPSPFDiTauCollection"/>
+  <class name="edm::Wrapper<l1t::L1HPSPFDiTauCollection>"/> 
+  <class name="edm::Ref<l1t::L1HPSPFDiTauCollection>"/>          
+  <class name="edm::RefVector<l1t::L1HPSPFDiTauCollection>"/>  
+</lcgdict>
