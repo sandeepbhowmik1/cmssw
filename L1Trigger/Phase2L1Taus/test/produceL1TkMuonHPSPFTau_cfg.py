@@ -24,17 +24,11 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        #'/store/mc/PhaseIIMTDTDRAutumn18MiniAOD/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/MINIAODSIM/PU200_103X_upgrade2023_realistic_v2-v1/120000/556D067D-7601-BD4D-A168-88D0A67428DB.root',
-        'file:/hdfs/local/sbhowmik/Sample/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/PhaseIIMTDTDRAutumn18MiniAOD-PU200_103X_upgrade2023_realistic_v2-v1/MINIAODSIM/556D067D-7601-BD4D-A168-88D0A67428DB.root',
-        #'file:/afs/cern.ch/work/s/sbhowmik/sample/556D067D-7601-BD4D-A168-88D0A67428DB.root',
-    ),
+        '/store/mc/PhaseIIMTDTDRAutumn18MiniAOD/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/MINIAODSIM/PU200_103X_upgrade2023_realistic_v2-v1/120000/556D067D-7601-BD4D-A168-88D0A67428DB.root',
+        ),
     secondaryFileNames = cms.untracked.vstring(
-        #'/store/mc/PhaseIIMTDTDRAutumn18DR/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/120000/B12B9398-9DBA-D442-855D-BFEBCE64D269.root',
-        #'/store/mc/PhaseIIMTDTDRAutumn18DR/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/120000/5AB0C82F-3846-4D45-A27F-A356DEB6C5DE.root',
-        'file:/hdfs/local/sbhowmik/Sample/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/PhaseIIMTDTDRAutumn18MiniAOD-PU200_103X_upgrade2023_realistic_v2-v1/FEVT/B12B9398-9DBA-D442-855D-BFEBCE64D269.root',
-        'file:/hdfs/local/sbhowmik/Sample/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/PhaseIIMTDTDRAutumn18MiniAOD-PU200_103X_upgrade2023_realistic_v2-v1/FEVT/5AB0C82F-3846-4D45-A27F-A356DEB6C5DE.root',
-        #'file:/afs/cern.ch/work/s/sbhowmik/sample/B12B9398-9DBA-D442-855D-BFEBCE64D269.root',
-        #'file:/afs/cern.ch/work/s/sbhowmik/sample/5AB0C82F-3846-4D45-A27F-A356DEB6C5DE.root',
+        '/store/mc/PhaseIIMTDTDRAutumn18DR/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/120000/B12B9398-9DBA-D442-855D-BFEBCE64D269.root',
+        '/store/mc/PhaseIIMTDTDRAutumn18DR/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/120000/5AB0C82F-3846-4D45-A27F-A356DEB6C5DE.root',
     ),
     inputCommands = cms.untracked.vstring("keep *", 
         "drop l1tEMTFHit2016Extras_simEmtfDigis_CSC_HLT",
@@ -63,7 +57,7 @@ process.configurationMetadata = cms.untracked.PSet(
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '103X_upgrade2023_realistic_v2', '')
 
 # Sequence, Path and EndPath definitions
 process.productionSequence = cms.Sequence()
@@ -88,6 +82,12 @@ process.productionSequence += process.SimL1Emulator
 
 process.load("L1Trigger.Phase2L1ParticleFlow.pfTracksFromL1Tracks_cfi")
 process.productionSequence += process.pfTracksFromL1Tracks
+
+from L1Trigger.L1TTrackMatch.L1TkMuonProducer_cfi import L1TkMuons
+process.productionSequence += process.L1TkMuons
+
+from L1Trigger.L1TTrackMatch.L1TkGlbMuonProducer_cfi import L1TkGlbMuons
+process.productionSequence += process.L1TkGlbMuons
 
 process.load("L1Trigger.Phase2L1ParticleFlow.l1ParticleFlow_cff")
 process.productionSequence += process.l1ParticleFlow
@@ -131,7 +131,8 @@ process.productionSequence += process.kt6L1PFJetsNeutralsPuppi
 ############################################################
 
 process.load("PhysicsTools.JetMCAlgos.TauGenJets_cfi")
-process.tauGenJets.GenParticles = cms.InputTag("prunedGenParticles")
+##process.tauGenJets.GenParticles = cms.InputTag("prunedGenParticles")
+process.tauGenJets.GenParticles = cms.InputTag("genParticles")
 
 process.load("PhysicsTools.JetMCAlgos.TauGenJetsDecayModeSelectorAllHadrons_cfi")
 
@@ -142,8 +143,8 @@ process.productionSequence += process.genTaus
 # produce  L1 HPS PF Tau objects
 ############################################################
 
-from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPF_cff import L1HPSPFTauProducerPF
-from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPuppi_cff import L1HPSPFTauProducerPuppi
+from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPF_cfi import L1HPSPFTauProducerPF
+from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPuppi_cfi import L1HPSPFTauProducerPuppi
 for useStrips in [ True, False ]:
     for applyPreselection in [ True, False ]:
         moduleNameBase = "L1HPSPFTauProducer"
@@ -176,53 +177,12 @@ for useStrips in [ True, False ]:
         setattr(process, moduleNamePuppi, modulePuppi)
         process.productionSequence += getattr(process, moduleNamePuppi)
 
-############################################################ 
-# produce  L1 HPS PF DiTau objects 
-############################################################ 
-'''
-process.load("L1Trigger.Phase2L1Taus.L1HPSPFDiTauProducer_cff")
-process.L1HPSPFDiTauProducer.srcL1HPSPFTaus = cms.InputTag("L1HPSPFTauProducerWithStripsWithoutPreselectionPF")
-process.L1HPSPFDiTauProducer.max_dz = cms.double(0.4)
-process.L1HPSPFDiTauProducer.debug = cms.untracked.bool(True)
-process.productionSequence += process.L1HPSPFDiTauProducer
-'''
-from L1Trigger.Phase2L1Taus.L1HPSPFDiTauProducer_cff import L1HPSPFDiTauProducer
-for useStrips in [ True, False ]:
-    for applyPreselection in [ True, False ]:
-        tauModuleNameBase = "L1HPSPFTauProducer"
-        ditauModuleNameBase = "L1HPSPFDiTauProducer"
-        if useStrips and applyPreselection:
-            tauModuleNameBase += "WithStripsAndPreselection"
-            ditauModuleNameBase += "WithStripsAndPreselection"
-        elif useStrips and not applyPreselection:
-            tauModuleNameBase += "WithStripsWithoutPreselection"
-            ditauModuleNameBase += "WithStripsWithoutPreselection"
-        elif not useStrips and applyPreselection:
-            tauModuleNameBase += "WithoutStripsWithPreselection"
-            ditauModuleNameBase += "WithoutStripsWithPreselection"
-        elif not useStrips and not applyPreselection:
-            tauModuleNameBase += "WithoutStripsAndPreselection"
-            ditauModuleNameBase += "WithoutStripsAndPreselection"
-        else:
-            raise ValueError("Invalid Combination of 'useStrips' and 'applyPreselection' Configuration parameters !!")
 
-        tauModuleNamePF = tauModuleNameBase + "PF" 
-        ditauModuleNamePF = ditauModuleNameBase + "PF"
-        ditauModulePF = L1HPSPFDiTauProducer.clone(
-            srcL1HPSPFTaus = cms.InputTag(tauModuleNamePF),
-            debug = cms.untracked.bool(False)
-        )
-        setattr(process, ditauModuleNamePF, ditauModulePF)
-        process.productionSequence += getattr(process, ditauModuleNamePF)
-
-        tauModuleNamePuppi =  tauModuleNameBase + "Puppi"
-        ditauModuleNamePuppi = ditauModuleNameBase + "Puppi"
-        ditauModulePuppi = L1HPSPFDiTauProducer.clone(
-            srcL1HPSPFTaus = cms.InputTag(tauModuleNamePuppi),
-            debug = cms.untracked.bool(False)
-        )
-        setattr(process, ditauModuleNamePuppi, ditauModulePuppi)
-        process.productionSequence += getattr(process, ditauModuleNamePuppi)
+############################################################ 
+# produce L1 TkMuonon-HPSPFTau cross trigge
+############################################################ 
+process.load("L1Trigger.Phase2L1Taus.L1TkMuonHPSPFTauProducer_cff")
+process.productionSequence += process.L1TkMuonHPSPFTauProducer
 
 
 ############################################################ 
@@ -235,6 +195,7 @@ process.L1PFTauProducer.L1PFObjects = cms.InputTag("l1pfCandidates:PF")
 process.L1PFTauProducer.L1Neutrals = cms.InputTag("l1pfCandidates")
 process.productionSequence += process.L1PFTauProducer
 
+
 process.production_step = cms.Path(process.productionSequence)
 
 ############################################################ 
@@ -242,7 +203,7 @@ process.production_step = cms.Path(process.productionSequence)
 ############################################################ 
 
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string("NTuple_L1HPSPFDiTauProducer.root"),                           
+    fileName = cms.untracked.string("NTuple_L1TkMuonHPSPFTauProducer.root"),
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('production_step')
     ),
@@ -261,8 +222,10 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_caloStage2Digis_*_*',
         'keep *_L1HPSPFTauProducer*PF_*_*',                           
         'keep *_L1HPSPFTauProducer*Puppi_*_*',
-        'keep *_L1HPSPFDiTauProducer*_*_*',                            
+        'keep *_L1TkMuon*_*_*',
+        'keep *_L1TkGlbMuons*_*_*',                            
         'keep *_prunedGenParticles_*_*',
+        'keep *_genParticles_*_*',
         'keep *_tauGenJetsSelectorAllHadrons_*_*',
         'keep *_particleFlow_*_*',
         'keep *_generalTracks_*_*',
@@ -278,6 +241,11 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_kt6L1PFJetsPuppi_rho_*',                             
         'keep *_kt6L1PFJetsNeutralsPuppi_rho_*',
         'keep *_slimmedAddPileupInfo_*_*', 
+        'keep *_L1TkMuonHPSPFTauProducer*_*_*',
+        'keep *_generator_*_*',
+        'keep *_*gen*_*_*',
+        'keep *_*Gen*_*_*',
+        'keep *_genParticles_*_*',
     )                           
 )
 process.outpath = cms.EndPath(process.out)
