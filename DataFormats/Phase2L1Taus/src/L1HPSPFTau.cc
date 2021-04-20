@@ -41,7 +41,7 @@ ostream& operator<<(ostream& os, const l1t::L1HPSPFTau& l1PFTau)
   {
     os << " chargedPFCand";
   }
-  else if ( l1PFTau.isPFJetSeeded() ) 
+  else if ( l1PFTau.isJetSeeded() ) 
   {
     os << " PFJet";
   }

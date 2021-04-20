@@ -95,13 +95,12 @@ void L1HPSPFTauBuilder::reset()
   l1PFCandProductID_ = edm::ProductID();
   isPFCandSeeded_ = false;
   l1PFCand_seed_ = l1t::PFCandidateRef();
-  isPFJetSeeded_ = false;
-  l1PFJet_seed_ = l1t::PFJetRef();
+  isJetSeeded_ = false;
+  l1Jet_seed_ = reco::CaloJetRef();
   l1PFTauSeed_eta_ = 0.;
   l1PFTauSeed_phi_ = 0.;
   l1PFTauSeed_zVtx_ = 0.;
   sumAllL1PFCandidates_pt_ = 0.;
-  //primaryVertex_ = l1t::VertexRef();
   primaryVertex_ = l1t::TkPrimaryVertexRef();
   l1PFTau_ = l1t::L1HPSPFTau();
   rho_ = 0.;
@@ -142,7 +141,6 @@ void L1HPSPFTauBuilder::setL1PFCandProductID(const edm::ProductID& l1PFCandProdu
   l1PFCandProductID_ = l1PFCandProductID;
 }
 
-//void L1HPSPFTauBuilder::setVertex(const l1t::VertexRef& primaryVertex)
 void L1HPSPFTauBuilder::setVertex(const l1t::TkPrimaryVertexRef& primaryVertex)
 {
   primaryVertex_ = primaryVertex;
@@ -167,28 +165,28 @@ void L1HPSPFTauBuilder::setL1PFTauSeed(const l1t::PFCandidateRef& l1PFCand_seed)
   }
 }
  
-void L1HPSPFTauBuilder::setL1PFTauSeed(const l1t::PFJetRef& l1PFJet_seed)
+void L1HPSPFTauBuilder::setL1PFTauSeed(const reco::CaloJetRef& l1Jet_seed)
 {
   if ( debug_ )
   {
     std::cout << "<L1HPSPFTauBuilder::setL1PFTauSeed>:" << std::endl;
-    std::cout << "seeding L1HPSPFTau with PFJet:";
-    std::cout << " pT = " << l1PFJet_seed->pt()  << ", eta = " << l1PFJet_seed->eta() << ", phi = " << l1PFJet_seed->phi() << std::endl;
+    std::cout << "seeding L1HPSPFTau with Jet:";
+    std::cout << " pT = " << l1Jet_seed->pt()  << ", eta = " << l1Jet_seed->eta() << ", phi = " << l1Jet_seed->phi() << std::endl;
   }
 
-  l1PFJet_seed_ = l1PFJet_seed;
+  l1Jet_seed_ = l1Jet_seed;
   reco::Candidate::LorentzVector l1PFTauSeed_p4;
   float l1PFTauSeed_zVtx = 0.;
   bool l1PFTauSeed_hasVtx = false;
   float max_chargedPFCand_pt = -1.;
-  size_t numConstituents = l1PFJet_seed->numberOfDaughters();
+  size_t numConstituents = l1Jet_seed->numberOfDaughters();
   for ( size_t idxConstituent = 0; idxConstituent < numConstituents; ++idxConstituent )
   {
-    const l1t::PFCandidate* l1PFCand = dynamic_cast<const l1t::PFCandidate*>(l1PFJet_seed->daughter(idxConstituent));
+    const l1t::PFCandidate* l1PFCand = dynamic_cast<const l1t::PFCandidate*>(l1Jet_seed->daughter(idxConstituent));
     if ( !l1PFCand )
     {
       throw cms::Exception("L1HPSPFTauBuilder")
-	<< "PFJet was not built from l1t::PFCandidates !!\n";
+	<< "Jet was not built from l1t::PFCandidates !!\n";
     }
     if ( l1PFCand->id() == l1t::PFCandidate::ChargedHadron ||
 	 l1PFCand->id() == l1t::PFCandidate::Electron      ||
@@ -209,7 +207,7 @@ void L1HPSPFTauBuilder::setL1PFTauSeed(const l1t::PFJetRef& l1PFJet_seed)
     l1PFTauSeed_eta_  = l1PFTauSeed_p4.eta();
     l1PFTauSeed_phi_  = l1PFTauSeed_p4.phi();
     l1PFTauSeed_zVtx_ = l1PFTauSeed_zVtx; 
-    isPFJetSeeded_ = true;
+    isJetSeeded_ = true;
   }
 }
 
@@ -223,7 +221,7 @@ void L1HPSPFTauBuilder::addL1PFCandidates(const std::vector<l1t::PFCandidateRef>
   // do not build tau candidates for which no reference z-position exists,
   // as in this case charged PFCands originating from the primary (hard-scatter) interaction 
   // cannot be distinguished from charged PFCands originating from pileup
-  if ( !(isPFCandSeeded_ || isPFJetSeeded_) ) return; 
+  if ( !(isPFCandSeeded_ || isJetSeeded_) ) return; 
 
   for ( auto l1PFCand : l1PFCands ) 
   {
@@ -380,7 +378,7 @@ void L1HPSPFTauBuilder::setRho(double rho)
 
 bool L1HPSPFTauBuilder::isWithinSignalCone(const l1t::PFCandidate& l1PFCand)
 {
-  if ( isPFCandSeeded_ || isPFJetSeeded_ )
+  if ( isPFCandSeeded_ || isJetSeeded_ )
   {
     double deltaEta = l1PFCand.eta() - l1PFTauSeed_eta_;
     double deltaPhi = l1PFCand.phi() - l1PFTauSeed_phi_;
@@ -391,7 +389,7 @@ bool L1HPSPFTauBuilder::isWithinSignalCone(const l1t::PFCandidate& l1PFCand)
 
 bool L1HPSPFTauBuilder::isWithinStrip(const l1t::PFCandidate& l1PFCand)
 {
-  if ( isPFCandSeeded_ || isPFJetSeeded_ )
+  if ( isPFCandSeeded_ || isJetSeeded_ )
   {
     double deltaEta = l1PFCand.eta() - l1PFTauSeed_eta_;
     double deltaPhi = l1PFCand.phi() - l1PFTauSeed_phi_;
@@ -427,7 +425,7 @@ void L1HPSPFTauBuilder::buildL1PFTau()
   l1PFTau_.setP4(l1PFTau_p4);
 
   l1PFTau_.seedChargedPFCand_ = l1PFCand_seed_;
-  l1PFTau_.seedPFJet_ = l1PFJet_seed_;
+  l1PFTau_.seedJet_ = l1Jet_seed_;
 
   l1PFTau_.signalAllL1PFCandidates_ = convertToRefVector(signalAllL1PFCandidates_);
   l1PFTau_.signalChargedHadrons_ = convertToRefVector(signalChargedHadrons_);

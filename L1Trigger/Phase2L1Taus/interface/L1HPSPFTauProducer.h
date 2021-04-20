@@ -12,7 +12,7 @@
 #include "DataFormats/Phase2L1Taus/interface/L1HPSPFTau.h"         // l1t::L1HPSPFTau
 #include "DataFormats/Phase2L1Taus/interface/L1HPSPFTauFwd.h"      // l1t::L1HPSPFTauCollection
 #include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"       // l1t::PFCandidate, l1t::PFCandidateCollection, l1t::PFCandidateRef 
-#include "DataFormats/L1TParticleFlow/interface/PFJet.h"             // l1t::PFJet, l1t::PFJetCollection, l1t::PFJetRef  
+#include "DataFormats/JetReco/interface/CaloJet.h"                 
 #include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
 
 #include <string>
@@ -33,10 +33,9 @@ class L1HPSPFTauProducer : public edm::EDProducer
   
   edm::InputTag srcL1PFCands_;
   edm::EDGetTokenT<l1t::PFCandidateCollection> tokenL1PFCands_;
-  edm::InputTag srcL1PFJets_;
-  edm::EDGetTokenT<l1t::PFJetCollection> tokenL1PFJets_;
+  edm::InputTag srcL1Jets_;
+  edm::EDGetTokenT<std::vector<reco::CaloJet>> tokenL1Jets_;
   edm::InputTag srcL1Vertices_;
-  //edm::EDGetTokenT<l1t::VertexCollection> tokenL1Vertices_;
   edm::EDGetTokenT<std::vector<l1t::TkPrimaryVertex>> tokenL1Vertices_;
   edm::InputTag srcRho_;
   edm::EDGetTokenT<double> tokenRho_;
@@ -49,9 +48,9 @@ class L1HPSPFTauProducer : public edm::EDProducer
   double max_seedChargedPFCand_eta_;
   double max_seedChargedPFCand_dz_;
 
-  bool usePFJetSeeds_;
-  double min_seedPFJet_pt_;
-  double max_seedPFJet_eta_;
+  bool useJetSeeds_;
+  double min_seedJet_pt_;
+  double max_seedJet_eta_;
 
   double min_PFTau_pt_;
   double max_PFTau_eta_;

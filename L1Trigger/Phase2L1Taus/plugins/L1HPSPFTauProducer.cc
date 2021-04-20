@@ -11,9 +11,9 @@ L1HPSPFTauProducer::L1HPSPFTauProducer(const edm::ParameterSet& cfg)
   , min_seedChargedPFCand_pt_(cfg.getParameter<double>("min_seedChargedPFCand_pt"))
   , max_seedChargedPFCand_eta_(cfg.getParameter<double>("max_seedChargedPFCand_eta"))
   , max_seedChargedPFCand_dz_(cfg.getParameter<double>("max_seedChargedPFCand_dz"))
-  , usePFJetSeeds_(cfg.getParameter<bool>("usePFJetSeeds"))
-  , min_seedPFJet_pt_(cfg.getParameter<double>("min_seedPFJet_pt"))
-  , max_seedPFJet_eta_(cfg.getParameter<double>("max_seedPFJet_eta"))
+  , useJetSeeds_(cfg.getParameter<bool>("useJetSeeds"))
+  , min_seedJet_pt_(cfg.getParameter<double>("min_seedJet_pt"))
+  , max_seedJet_eta_(cfg.getParameter<double>("max_seedJet_eta"))
   , min_PFTau_pt_(cfg.getParameter<double>("min_PFTau_pt"))
   , max_PFTau_eta_(cfg.getParameter<double>("max_PFTau_eta"))
   , min_leadChargedPFCand_pt_(cfg.getParameter<double>("min_leadChargedPFCand_pt"))
@@ -34,23 +34,16 @@ L1HPSPFTauProducer::L1HPSPFTauProducer(const edm::ParameterSet& cfg)
 
   srcL1PFCands_ = cfg.getParameter<edm::InputTag>("srcL1PFCands");
   tokenL1PFCands_ = consumes<l1t::PFCandidateCollection>(srcL1PFCands_);
-  srcL1PFJets_ = cfg.getParameter<edm::InputTag>("srcL1PFJets");
-  if ( usePFJetSeeds_ )
+  srcL1Jets_ = cfg.getParameter<edm::InputTag>("srcL1Jets");
+  if ( useJetSeeds_ )
   {
-    tokenL1PFJets_ = consumes<l1t::PFJetCollection>(srcL1PFJets_);
+    tokenL1Jets_ = consumes<std::vector<reco::CaloJet>>(srcL1Jets_);
   }
   srcL1Vertices_ = cfg.getParameter<edm::InputTag>("srcL1Vertices");
   if ( srcL1Vertices_.label() != "" ) 
   {
-    //tokenL1Vertices_ = consumes<l1t::VertexCollection>(srcL1Vertices_);
     tokenL1Vertices_ = consumes<std::vector<l1t::TkPrimaryVertex>>(srcL1Vertices_);
   }
-  srcRho_ = cfg.getParameter<edm::InputTag>("srcRho");
-  if ( srcRho_.label() != "" ) 
-  {
-    tokenRho_ = consumes<double>(srcRho_);
-  }
-
   deltaR2_cleaning_ = deltaR_cleaning_*deltaR_cleaning_;
 
   edm::ParameterSet cfg_signalQualityCuts = cfg.getParameter<edm::ParameterSet>("signalQualityCuts");
@@ -90,27 +83,17 @@ void L1HPSPFTauProducer::produce(edm::Event& evt, const edm::EventSetup& es)
   edm::Handle<l1t::PFCandidateCollection> l1PFCands;
   evt.getByToken(tokenL1PFCands_, l1PFCands);
 
-  //l1t::VertexRef primaryVertex;
   l1t::TkPrimaryVertexRef primaryVertex;
   float primaryVertex_z = 0.;
   if ( srcL1Vertices_.label() != "" ) 
   {
-    //edm::Handle<l1t::VertexCollection> vertices;
     edm::Handle<std::vector<l1t::TkPrimaryVertex>> vertices;
     evt.getByToken(tokenL1Vertices_, vertices);
     if ( vertices->size() > 0 ) 
     {
-      //primaryVertex = l1t::VertexRef(vertices, 0);
       primaryVertex = l1t::TkPrimaryVertexRef(vertices, 0);
-      //primaryVertex_z = primaryVertex->z0();
       primaryVertex_z = primaryVertex->zvertex();
     }
-  }
-
-  edm::Handle<double> rho;
-  if ( srcRho_.label() != "" ) 
-  {
-    evt.getByToken(tokenRho_, rho);
   }
 
   if ( debug_ ) 
@@ -182,10 +165,6 @@ void L1HPSPFTauProducer::produce(edm::Event& evt, const edm::EventSetup& es)
 	  tauBuilder_->setVertex(primaryVertex);
 	  tauBuilder_->setL1PFTauSeed(l1PFCand);
 	  tauBuilder_->addL1PFCandidates(selectedL1PFCands_signal_or_isolationQualityCuts);
-	  if ( srcRho_.label() != "" ) 
-	  {
-	    tauBuilder_->setRho(*rho);
-	  }
 	  tauBuilder_->buildL1PFTau();
 	  l1t::L1HPSPFTau l1PFTau = tauBuilder_->getL1PFTau();
 	  if ( l1PFTau.pt() > 1. ) l1PFTauCollection_uncleaned.push_back(l1PFTau);
@@ -194,25 +173,21 @@ void L1HPSPFTauProducer::produce(edm::Event& evt, const edm::EventSetup& es)
     }
   }
 
-  if ( usePFJetSeeds_ )
+  if ( useJetSeeds_ )
   {
-    edm::Handle<l1t::PFJetCollection> l1PFJets;
-    evt.getByToken(tokenL1PFJets_, l1PFJets);
+    edm::Handle<std::vector<reco::CaloJet>> l1Jets;
+    evt.getByToken(tokenL1Jets_, l1Jets);
 
-    size_t numL1PFJets = l1PFJets->size();    
-    for ( size_t idxL1PFJet = 0; idxL1PFJet < numL1PFJets; ++idxL1PFJet ) {
-      l1t::PFJetRef l1PFJet(l1PFJets, idxL1PFJet);
-      if ( l1PFJet->pt() > min_seedPFJet_pt_ && std::fabs(l1PFJet->eta()) < max_seedPFJet_eta_ )
+    size_t numL1Jets = l1Jets->size();    
+    for ( size_t idxL1Jet = 0; idxL1Jet < numL1Jets; ++idxL1Jet ) {
+      reco::CaloJetRef l1Jet(l1Jets, idxL1Jet);
+      if ( l1Jet->pt() > min_seedJet_pt_ && std::fabs(l1Jet->eta()) < max_seedJet_eta_ )
       {
 	tauBuilder_->reset();
 	tauBuilder_->setL1PFCandProductID(l1PFCands.id());
 	tauBuilder_->setVertex(primaryVertex);
-	tauBuilder_->setL1PFTauSeed(l1PFJet);
+	tauBuilder_->setL1PFTauSeed(l1Jet);
 	tauBuilder_->addL1PFCandidates(selectedL1PFCands_signal_or_isolationQualityCuts);
-	if ( srcRho_.label() != "" ) 
-	{
-	  tauBuilder_->setRho(*rho);
-	}
 	tauBuilder_->buildL1PFTau();
 	l1t::L1HPSPFTau l1PFTau = tauBuilder_->getL1PFTau();
 	if ( l1PFTau.pt() > 1. ) l1PFTauCollection_uncleaned.push_back(l1PFTau);
@@ -241,7 +216,6 @@ void L1HPSPFTauProducer::produce(edm::Event& evt, const edm::EventSetup& es)
 	   l1PFTau.leadChargedPFCand()->pt() > min_leadChargedPFCand_pt_ && std::fabs(l1PFTau.leadChargedPFCand()->eta()) < max_leadChargedPFCand_eta_ && 
            (srcL1Vertices_.label() == "" || 
 	    (primaryVertex.isNonnull() && l1PFTau.leadChargedPFCand()->pfTrack().isNonnull() &&
-	     //std::fabs(l1PFTau.leadChargedPFCand()->pfTrack()->vertex().z() - primaryVertex->z0()) < max_leadChargedPFCand_dz_)) &&
 	     std::fabs(l1PFTau.leadChargedPFCand()->pfTrack()->vertex().z() - primaryVertex->zvertex()) < max_leadChargedPFCand_dz_)) &&
            l1PFTau.sumChargedIso() < max_chargedIso_ && l1PFTau.sumChargedIso() < max_chargedRelIso_*l1PFTau.pt()) ) continue;
 

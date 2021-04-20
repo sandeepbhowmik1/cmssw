@@ -2,6 +2,7 @@
  <use   name="DataFormats/L1TParticleFlow"/>
  <use   name="DataFormats/Phase2L1Taus"/>
  <use   name="L1Trigger/Phase2L1Taus"/>
+ <use   name="DataFormats/JetReco"/>
  <use   name="hepmc"/>
  <use   name="root"/>
  <use   name="boost"/>

@@ -25,7 +25,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-'file:/hdfs/cms/store/mc/Phase2HLTTDRWinter20DIGI/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack_tuneCP5/GEN-SIM-DIGI-RAW/PU200_110X_mcRun4_realistic_v3-v1/240000/000D502D-3B98-234C-9191-1817C6EF4802.root',
+        '/store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/VBFHToTauTau_M125_14TeV_powheg_pythia8_correctedGridpack_tuneCP5/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v1/120000/084C8B72-BC64-DE46-801F-D971D5A34F62.root'
     ),
     inputCommands = cms.untracked.vstring("keep *", 
         "drop l1tEMTFHit2016Extras_simEmtfDigis_CSC_HLT",
@@ -94,6 +94,10 @@ process.productionSequence += process.pfTracksFromL1Tracks
 process.load("L1Trigger.Phase2L1ParticleFlow.l1ParticleFlow_cff")
 process.productionSequence += process.l1ParticleFlow
 
+process.load('L1Trigger.L1CaloTrigger.Phase1L1TJets_cff')
+process.productionSequence += process.Phase1L1TJetsSequence
+
+'''
 process.load("L1Trigger.Phase2L1ParticleFlow.l1pfJetMet_cff")
 process.l1PFJets = cms.Sequence(process.l1PFJetsTask)
 process.productionSequence += process.l1PFJets
@@ -128,7 +132,7 @@ process.kt6L1PFJetsNeutralsPuppi = process.kt6L1PFJetsPuppi.clone(
     src = cms.InputTag('l1pfNeutralCandidatesPuppi')
 ) 
 process.productionSequence += process.kt6L1PFJetsNeutralsPuppi
-
+'''
 ############################################################
 # Generator-level (visible) hadronic taus
 ############################################################
@@ -149,7 +153,9 @@ process.productionSequence += process.genTaus
 from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPF_cfi import L1HPSPFTauProducerPF
 from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPuppi_cfi import L1HPSPFTauProducerPuppi
 for useStrips in [ True, False ]:
+#for useStrips in [ True]:
     for applyPreselection in [ True, False ]:
+    #for applyPreselection in [ False ]:
         moduleNameBase = "L1HPSPFTauProducer"
         if useStrips and applyPreselection:
             moduleNameBase += "WithStripsAndPreselection"
@@ -171,14 +177,14 @@ for useStrips in [ True, False ]:
         setattr(process, moduleNamePF, modulePF)
         process.productionSequence += getattr(process, moduleNamePF)
 
-        moduleNamePuppi = moduleNameBase + "Puppi"
-        modulePuppi = L1HPSPFTauProducerPuppi.clone(
-            useStrips = cms.bool(useStrips),
-            applyPreselection = cms.bool(applyPreselection),
-            debug = cms.untracked.bool(False)
-        )
-        setattr(process, moduleNamePuppi, modulePuppi)
-        process.productionSequence += getattr(process, moduleNamePuppi)
+        #moduleNamePuppi = moduleNameBase + "Puppi"
+        #modulePuppi = L1HPSPFTauProducerPuppi.clone(
+        #    useStrips = cms.bool(useStrips),
+        #    applyPreselection = cms.bool(applyPreselection),
+        #    debug = cms.untracked.bool(False)
+        #)
+        #setattr(process, moduleNamePuppi, modulePuppi)
+        #process.productionSequence += getattr(process, moduleNamePuppi)
 
 
 process.production_step = cms.Path(process.productionSequence)
@@ -224,6 +230,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_kt6L1PFJetsPuppi_rho_*',                             
         'keep *_kt6L1PFJetsNeutralsPuppi_rho_*',
         'keep *_slimmedAddPileupInfo_*_*', 
+        "keep *_Phase1L1TJetProducer_*_*",
     )                           
 )
 process.outpath = cms.EndPath(process.out)

@@ -2,7 +2,7 @@
 #define DataFormats_Phase2L1Taus_L1HPSPFTau_H
 
 #include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"    // l1t::PFCandidate, l1t::PFCandidateRef, l1t::PFCandidateRefVector
-#include "DataFormats/L1TParticleFlow/interface/PFJet.h"          // l1t::PFJet, l1t::PFJetCollection, l1t::PFJetRef 
+#include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/Candidate/interface/LeafCandidate.h"             // reco::LeafCandidate 
 #include "DataFormats/Candidate/interface/Particle.h"                  // reco::Particle::LorentzVector
 #include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
@@ -26,10 +26,10 @@ class L1HPSPFTau : public reco::LeafCandidate
 
   /// accessor functions for reco level quantities
   bool isChargedPFCandSeeded() const { return seedChargedPFCand_.isNonnull(); }   
-  bool isPFJetSeeded()         const { return seedPFJet_.isNonnull();         } 
+  bool isJetSeeded()         const { return seedJet_.isNonnull();         } 
 
   const l1t::PFCandidateRef& seedChargedPFCand() const { return seedChargedPFCand_; }
-  const l1t::PFJetRef& seedPFJet()              const { return seedPFJet_;         }
+  const reco::CaloJetRef& seedJet()              const { return seedJet_;         }
   const l1t::PFCandidateRef& leadChargedPFCand() const { return leadChargedPFCand_; }
 
   const l1t::PFCandidateRefVector& signalAllL1PFCandidates() const { return signalAllL1PFCandidates_; }
@@ -89,7 +89,7 @@ class L1HPSPFTau : public reco::LeafCandidate
 
  private:
   l1t::PFCandidateRef seedChargedPFCand_;
-  l1t::PFJetRef seedPFJet_;
+  reco::CaloJetRef seedJet_;
   l1t::PFCandidateRef leadChargedPFCand_;
 
   l1t::PFCandidateRefVector signalAllL1PFCandidates_;

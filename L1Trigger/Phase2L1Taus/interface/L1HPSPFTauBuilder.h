@@ -3,12 +3,11 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"                   // edm::ParameterSet
 #include "DataFormats/Provenance/interface/ProductID.h"                   // edm::ProductID
-
 #include "L1Trigger/Phase2L1Taus/interface/LocalFileInPath.h"          // LocalFileInPath
 #include "L1Trigger/Phase2L1Taus/interface/L1HPSPFTauQualityCut.h" // L1HPSPFTauQualityCut
 #include "DataFormats/Phase2L1Taus/interface/L1HPSPFTau.h"         // l1t::L1HPSPFTau
 #include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"       // l1t::PFCandidate, l1t::PFCandidateCollection, l1t::PFCandidateRef
-#include "DataFormats/L1TParticleFlow/interface/PFJet.h"             // l1t::PFJet, l1t::PFJetCollection, l1t::PFJetRef
+#include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
 
 #include <TFormula.h> // TFormula
@@ -25,10 +24,9 @@ class L1HPSPFTauBuilder
   
   void reset();
   void setL1PFCandProductID(const edm::ProductID& l1PFCandProductID);
-  //void setVertex(const l1t::VertexRef& primaryVertex);
   void setVertex(const l1t::TkPrimaryVertexRef& primaryVertex);
   void setL1PFTauSeed(const l1t::PFCandidateRef& l1PFCand_seed);
-  void setL1PFTauSeed(const l1t::PFJetRef& l1PFJet_seed);
+  void setL1PFTauSeed(const reco::CaloJetRef& l1Jet_seed);
   void addL1PFCandidates(const std::vector<l1t::PFCandidateRef>& l1PFCands);
   void setRho(double rho);
   void buildL1PFTau();
@@ -71,8 +69,8 @@ class L1HPSPFTauBuilder
   edm::ProductID l1PFCandProductID_;
   bool isPFCandSeeded_;
   l1t::PFCandidateRef l1PFCand_seed_;
-  bool isPFJetSeeded_;
-  l1t::PFJetRef l1PFJet_seed_;
+  bool isJetSeeded_;
+  reco::CaloJetRef l1Jet_seed_;
   double l1PFTauSeed_eta_;
   double l1PFTauSeed_phi_;
   double l1PFTauSeed_zVtx_;
