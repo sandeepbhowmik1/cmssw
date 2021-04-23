@@ -3,9 +3,8 @@
 
 #include "DataFormats/Phase2L1Taus/interface/L1HPSPFTau.h"
 
-namespace l1t
-{
+namespace l1t {
   typedef std::vector<L1HPSPFTau> L1HPSPFTauCollection;
 }
 
-#endif 
+#endif

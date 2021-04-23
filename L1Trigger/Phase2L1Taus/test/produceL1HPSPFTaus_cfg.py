@@ -1,8 +1,5 @@
-
 import FWCore.ParameterSet.Config as cms
-
 from Configuration.StandardSequences.Eras import eras
-
 from Configuration.ProcessModifiers.convertHGCalDigisSim_cff import convertHGCalDigisSim
 from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
 process = cms.Process('Produce',Phase2C9)
@@ -97,52 +94,13 @@ process.productionSequence += process.l1ParticleFlow
 process.load('L1Trigger.L1CaloTrigger.Phase1L1TJets_cff')
 process.productionSequence += process.Phase1L1TJetsSequence
 
-'''
-process.load("L1Trigger.Phase2L1ParticleFlow.l1pfJetMet_cff")
-process.l1PFJets = cms.Sequence(process.l1PFJetsTask)
-process.productionSequence += process.l1PFJets
-
-process.kt6L1PFJetsPF = process.ak4PFL1PF.clone(
-    jetAlgorithm = cms.string("Kt"),
-    rParam       = cms.double(0.6),
-    doRhoFastjet = cms.bool(True),
-    Rho_EtaMax   = cms.double(3.0)
-)
-process.productionSequence += process.kt6L1PFJetsPF
-process.l1pfNeutralCandidatesPF = cms.EDFilter("L1TPFCandSelector",
-    src = cms.InputTag('l1pfCandidates:PF'),                                      
-    cut = cms.string("pdgId = 22"), # CV: cms.string("id = Photon") does not work (does not select any l1t::PFCandidates)
-    filter = cms.bool(False)                                           
-)
-process.productionSequence += process.l1pfNeutralCandidatesPF
-process.kt6L1PFJetsNeutralsPF = process.kt6L1PFJetsPF.clone(
-    src = cms.InputTag('l1pfNeutralCandidatesPF')
-) 
-process.productionSequence += process.kt6L1PFJetsNeutralsPF
-
-process.kt6L1PFJetsPuppi = process.kt6L1PFJetsPF.clone(
-    src = cms.InputTag('l1pfCandidates:Puppi')
-)    
-process.productionSequence += process.kt6L1PFJetsPuppi
-process.l1pfNeutralCandidatesPuppi = process.l1pfNeutralCandidatesPF.clone(
-    src = cms.InputTag('l1pfCandidates:Puppi'),                                      
-)
-process.productionSequence += process.l1pfNeutralCandidatesPuppi
-process.kt6L1PFJetsNeutralsPuppi = process.kt6L1PFJetsPuppi.clone(
-    src = cms.InputTag('l1pfNeutralCandidatesPuppi')
-) 
-process.productionSequence += process.kt6L1PFJetsNeutralsPuppi
-'''
 ############################################################
 # Generator-level (visible) hadronic taus
 ############################################################
 
 process.load("PhysicsTools.JetMCAlgos.TauGenJets_cfi")
-#process.tauGenJets.GenParticles = cms.InputTag("prunedGenParticles")
 process.tauGenJets.GenParticles = cms.InputTag("genParticles")
-
 process.load("PhysicsTools.JetMCAlgos.TauGenJetsDecayModeSelectorAllHadrons_cfi")
-
 process.genTaus = cms.Sequence(process.tauGenJets + process.tauGenJetsSelectorAllHadrons)
 process.productionSequence += process.genTaus
 
@@ -153,9 +111,7 @@ process.productionSequence += process.genTaus
 from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPF_cfi import L1HPSPFTauProducerPF
 from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPuppi_cfi import L1HPSPFTauProducerPuppi
 for useStrips in [ True, False ]:
-#for useStrips in [ True]:
     for applyPreselection in [ True, False ]:
-    #for applyPreselection in [ False ]:
         moduleNameBase = "L1HPSPFTauProducer"
         if useStrips and applyPreselection:
             moduleNameBase += "WithStripsAndPreselection"
@@ -177,14 +133,14 @@ for useStrips in [ True, False ]:
         setattr(process, moduleNamePF, modulePF)
         process.productionSequence += getattr(process, moduleNamePF)
 
-        #moduleNamePuppi = moduleNameBase + "Puppi"
-        #modulePuppi = L1HPSPFTauProducerPuppi.clone(
-        #    useStrips = cms.bool(useStrips),
-        #    applyPreselection = cms.bool(applyPreselection),
-        #    debug = cms.untracked.bool(False)
-        #)
-        #setattr(process, moduleNamePuppi, modulePuppi)
-        #process.productionSequence += getattr(process, moduleNamePuppi)
+        moduleNamePuppi = moduleNameBase + "Puppi"
+        modulePuppi = L1HPSPFTauProducerPuppi.clone(
+            useStrips = cms.bool(useStrips),
+            applyPreselection = cms.bool(applyPreselection),
+            debug = cms.untracked.bool(False)
+        )
+        setattr(process, moduleNamePuppi, modulePuppi)
+        process.productionSequence += getattr(process, moduleNamePuppi)
 
 
 process.production_step = cms.Path(process.productionSequence)
@@ -221,14 +177,6 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_electronGsfTracks_*_*',
         'keep *_offlineSlimmedPrimaryVertices_*_*',                           
         'keep *_L1PFTauProducer_*_*',
-        'keep *_ak4PFL1PF_*_*',
-        'keep *_ak4PFL1PFCorrected_*_*',
-        'keep *_kt6L1PFJetsPF_rho_*',                
-        'keep *_kt6L1PFJetsNeutralsPF_rho_*',                            
-        'keep *_ak4PFL1Puppi_*_*',
-        'keep *_ak4PFL1PuppiCorrected_*_*',
-        'keep *_kt6L1PFJetsPuppi_rho_*',                             
-        'keep *_kt6L1PFJetsNeutralsPuppi_rho_*',
         'keep *_slimmedAddPileupInfo_*_*', 
         "keep *_Phase1L1TJetProducer_*_*",
     )                           
