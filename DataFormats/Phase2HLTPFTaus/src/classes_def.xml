@@ -1,0 +1,11 @@
+<lcgdict>
+  <!--class name="reco::TrackBase::Point" ClassVersion="-1">
+   <version ClassVersion="-1" checksum="3209584749"/>
+  </class-->
+  <class name="edm::Wrapper<reco::TrackBase::Point>"/>
+  <class name="reco::PFTauPair" ClassVersion="10">
+   <version ClassVersion="10" checksum="1899125246"/>
+  </class>
+  <class name="reco::PFTauPairCollection"/>
+  <class name="edm::Wrapper<reco::PFTauPairCollection>"/>
+</lcgdict>
