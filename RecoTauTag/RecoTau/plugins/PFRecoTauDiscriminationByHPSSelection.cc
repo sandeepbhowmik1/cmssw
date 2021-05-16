@@ -62,14 +62,14 @@ private:
 
 PFRecoTauDiscriminationByHPSSelection::PFRecoTauDiscriminationByHPSSelection(const edm::ParameterSet& pset)
     : PFTauDiscriminationProducerBase(pset) {
-std::cout << "<PFRecoTauDiscriminationByHPSSelection::PFRecoTauDiscriminationByHPSSelection>:" << std::endl;
+  std::cout << "<PFRecoTauDiscriminationByHPSSelection::PFRecoTauDiscriminationByHPSSelection>:" << std::endl;
   // Get the matchign cut
   matchingCone_ = pset.getParameter<double>("matchingCone");
   minPt_ = pset.getParameter<double>("minTauPt");
   // Get the mass cuts for each decay mode
   typedef std::vector<edm::ParameterSet> VPSet;
   const VPSet& decayModes = pset.getParameter<VPSet>("decayModes");
-std::cout << "#decayModes = " << decayModes.size() << std::endl;
+  std::cout << "#decayModes = " << decayModes.size() << std::endl;
   for (auto const& decayMode : decayModes) {
     // The mass window(s)
     DecayModeCuts cuts;
@@ -84,15 +84,15 @@ std::cout << "#decayModes = " << decayModes.size() << std::endl;
     cuts.minPi0Mass_ = decayMode.getParameter<double>("minPi0Mass");
     cuts.maxPi0Mass_ = decayMode.getParameter<double>("maxPi0Mass");
     cuts.assumeStripMass_ = decayMode.getParameter<double>("assumeStripMass");
-std::cout << "adding decayModeCut for:" 
-          << " nCharged = " << decayMode.getParameter<uint32_t>("nCharged") << "," 
-          << " nPiZeros = " << decayMode.getParameter<uint32_t>("nPiZeros") << std::endl;
+    std::cout << "adding decayModeCut for:"
+              << " nCharged = " << decayMode.getParameter<uint32_t>("nCharged") << ","
+              << " nPiZeros = " << decayMode.getParameter<uint32_t>("nPiZeros") << std::endl;
     decayModeCuts_.insert(std::make_pair(
         // The decay mode as a key
         std::make_pair(decayMode.getParameter<uint32_t>("nCharged"), decayMode.getParameter<uint32_t>("nPiZeros")),
         cuts));
   }
-std::cout << "#decayModeCuts = " << decayModeCuts_.size() << std::endl;
+  std::cout << "#decayModeCuts = " << decayModeCuts_.size() << std::endl;
   requireTauChargedHadronsToBeChargedPFCands_ = pset.getParameter<bool>("requireTauChargedHadronsToBeChargedPFCands");
   minPixelHits_ = pset.getParameter<int>("minPixelHits");
   verbosity_ = pset.getParameter<int>("verbosity");
@@ -124,10 +124,10 @@ namespace {
 }  // namespace
 
 double PFRecoTauDiscriminationByHPSSelection::discriminate(const reco::PFTauRef& tau) const {
-  if (verbosity_) {  
+  if (verbosity_) {
     std::cout << "<PFRecoTauDiscriminationByHPSSelection::discriminate>:";
-    std::cout << "pT = " << tau->pt() << ", eta = " << tau->eta() << ", phi = " << tau->phi() << "," 
-                                      << " decayMode = " << tau->decayMode() << ", mass = " << tau->mass() << std::endl; 
+    std::cout << "pT = " << tau->pt() << ", eta = " << tau->eta() << ", phi = " << tau->phi() << ","
+              << " decayMode = " << tau->decayMode() << ", mass = " << tau->mass() << std::endl;
     std::cout << " nCharged = " << tau->signalTauChargedHadronCandidates().size();
     std::cout << " nPiZeros = " << tau->signalPiZeroCandidates().size();
   }
@@ -184,8 +184,7 @@ double PFRecoTauDiscriminationByHPSSelection::discriminate(const reco::PFTauRef&
       }
     }
     if (verbosity_) {
-      std::cout << "nChargedPFCands = " << nChargedPFCands
-                                        << " (min = " << massWindow.nChargedPFCandsMin_ << ")";
+      std::cout << "nChargedPFCands = " << nChargedPFCands << " (min = " << massWindow.nChargedPFCandsMin_ << ")";
     }
     if (nChargedPFCands < massWindow.nChargedPFCandsMin_) {
       if (verbosity_) {
@@ -197,8 +196,8 @@ double PFRecoTauDiscriminationByHPSSelection::discriminate(const reco::PFTauRef&
 
   math::XYZTLorentzVector tauP4 = tau->p4();
   if (verbosity_) {
-    std::cout << "tau: Pt = " << tauP4.pt() << ", eta = " << tauP4.eta()
-                                      << ", phi = " << tauP4.phi() << ", mass = " << tauP4.mass();
+    std::cout << "tau: Pt = " << tauP4.pt() << ", eta = " << tauP4.eta() << ", phi = " << tauP4.phi()
+              << ", mass = " << tauP4.mass();
   }
   // Find the total pizero p4
   reco::Candidate::LorentzVector stripsP4;
@@ -218,8 +217,8 @@ double PFRecoTauDiscriminationByHPSSelection::discriminate(const reco::PFTauRef&
     }
   }
   if (verbosity_) {
-    std::cout << "strips: Pt = " << stripsP4.pt() << ", eta = " << stripsP4.eta()
-                                      << ", phi = " << stripsP4.phi() << ", mass = " << stripsP4.mass();
+    std::cout << "strips: Pt = " << stripsP4.pt() << ", eta = " << stripsP4.eta() << ", phi = " << stripsP4.phi()
+              << ", mass = " << stripsP4.mass();
   }
 
   // Check if tau fails mass cut
@@ -228,7 +227,8 @@ double PFRecoTauDiscriminationByHPSSelection::discriminate(const reco::PFTauRef&
   if (!((tauP4.M() - bendCorrection_mass) < maxMass_value && (tauP4.M() + bendCorrection_mass) > massWindow.minMass_)) {
     if (verbosity_) {
       std::cout << " fails tau mass-window cut.";
-      std::cout << "(maxMass_value = " << maxMass_value << ", bendCorrection_mass = " << bendCorrection_mass << ")" << std::endl;
+      std::cout << "(maxMass_value = " << maxMass_value << ", bendCorrection_mass = " << bendCorrection_mass << ")"
+                << std::endl;
     }
     return 0.0;
   }

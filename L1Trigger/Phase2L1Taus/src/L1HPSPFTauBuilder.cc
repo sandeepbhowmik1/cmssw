@@ -8,7 +8,8 @@
 #include <cmath>                                   // std::fabs
 
 L1HPSPFTauBuilder::L1HPSPFTauBuilder(const edm::ParameterSet& cfg)
-  : signalConeSizeFormula_(std::regex_replace(cfg.getParameter<std::string>("signalConeSize"), std::regex("pt"), "x")),
+    : signalConeSizeFormula_(
+          std::regex_replace(cfg.getParameter<std::string>("signalConeSize"), std::regex("pt"), "x")),
       minSignalConeSize_(cfg.getParameter<double>("minSignalConeSize")),
       maxSignalConeSize_(cfg.getParameter<double>("maxSignalConeSize")),
       useStrips_(cfg.getParameter<bool>("useStrips")),
@@ -16,7 +17,6 @@ L1HPSPFTauBuilder::L1HPSPFTauBuilder(const edm::ParameterSet& cfg)
       stripSizePhi_(cfg.getParameter<double>("stripSizePhi")),
       isolationConeSize_(cfg.getParameter<double>("isolationConeSize")),
       debug_(cfg.getUntrackedParameter<bool>("debug", false)) {
-
   assert(maxSignalConeSize_ >= minSignalConeSize_);
 
   isolationConeSize2_ = isolationConeSize_ * isolationConeSize_;

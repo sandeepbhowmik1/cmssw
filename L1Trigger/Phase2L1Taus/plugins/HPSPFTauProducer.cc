@@ -209,12 +209,10 @@ void HPSPFTauProducer::produce(edm::Event& evt, const edm::EventSetup& es) {
   evt.put(std::move(l1PFTauCollectionCleaned));
 }
 
-
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
 
-void
-HPSPFTauProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void HPSPFTauProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   // HPSPFTauProducerPF
   edm::ParameterSetDescription desc;
   desc.add<bool>("useJetSeeds", true);
@@ -256,7 +254,7 @@ HPSPFTauProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
   desc.add<double>("minSeedJetPt", 30.0);
   desc.add<double>("maxChargedRelIso", 1.0);
   desc.add<double>("minSeedChargedPFCandPt", 5.0);
-  desc.add<edm::InputTag>("srcL1PFCands", edm::InputTag("l1pfCandidates","PF"));
+  desc.add<edm::InputTag>("srcL1PFCands", edm::InputTag("l1pfCandidates", "PF"));
   desc.add<double>("stripSizeEta", 0.05);
   desc.add<double>("maxLeadChargedPFCandEta", 2.4);
   desc.add<double>("deltaRCleaning", 0.4);
@@ -304,14 +302,13 @@ HPSPFTauProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
   desc.add<double>("maxLeadChargedPFCandDz", 1000.0);
   desc.add<double>("maxSeedJetEta", 2.4);
   desc.add<std::string>("signalConeSize", "2.8/max(1., pt)");
-  desc.add<edm::InputTag>("srcL1Jets", edm::InputTag("Phase1L1TJetProducer","UncalibratedPhase1L1TJetFromPfCandidates"));
+  desc.add<edm::InputTag>("srcL1Jets",
+                          edm::InputTag("Phase1L1TJetProducer", "UncalibratedPhase1L1TJetFromPfCandidates"));
   desc.addUntracked<bool>("debug", false);
   desc.add<double>("maxPFTauEta", 2.4);
   desc.add<double>("maxSignalConeSize", 0.1);
   descriptions.addWithDefaultLabel(desc);
 }
-
-
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 DEFINE_FWK_MODULE(HPSPFTauProducer);

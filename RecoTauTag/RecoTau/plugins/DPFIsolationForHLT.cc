@@ -1,12 +1,12 @@
 /*
- * \class DPFIsolation
+ * \class DPFIsolationForHLT
  *
  * Deep ParticleFlow tau isolation using Deep NN.
  *
  * \author Owen Colegrove, UCSB
  */
 
-#include "RecoTauTag/RecoTau/interface/DeepTauBase.h"
+#include "RecoTauTag/RecoTau/interface/DeepTauBaseForHLT.h"
 
 namespace {
   inline int getPFCandidateIndex(const edm::Handle<pat::PackedCandidateCollection>& pfcands,
@@ -19,7 +19,7 @@ namespace {
   }
 }  // anonymous namespace
 
-class DPFIsolation : public deep_tau::DeepTauBase {
+class DPFIsolationForHLT : public deep_tau::DeepTauBaseForHLT {
 public:
   static const OutputCollection& GetOutputs() {
     const size_t tau_index = 0;
@@ -56,25 +56,27 @@ public:
     descWP.add<std::string>("VTight", "0");
     descWP.add<std::string>("VVTight", "0");
     descWP.add<std::string>("VVVTight", "0");
-    desc.add<edm::ParameterSetDescription>("VSallWP", descWP);
-    descriptions.add("DPFTau2016v0", desc);
+    desc.add<edm::ParameterSetDescription>("VSallWPForHLT", descWP);
+    descriptions.add("DPFTau2016v0ForHLT", desc);
   }
 
-  explicit DPFIsolation(const edm::ParameterSet& cfg, const deep_tau::DeepTauCache* cache)
-      : DeepTauBase(cfg, GetOutputs(), cache), graphVersion(cfg.getParameter<unsigned>("version")) {
+  explicit DPFIsolationForHLT(const edm::ParameterSet& cfg, const deep_tau::DeepTauCacheForHLT* cache)
+      : DeepTauBaseForHLT(cfg, GetOutputs(), cache), graphVersion(cfg.getParameter<unsigned>("version")) {
     const auto& shape = cache_->getGraph().node(0).attr().at("shape").shape();
 
     if (!(graphVersion == 1 || graphVersion == 0))
-      throw cms::Exception("DPFIsolation") << "unknown version of the graph file.";
+      throw cms::Exception("DPFIsolationForHLT") << "unknown version of the graph file.";
 
     if (!(shape.dim(1).size() == getNumberOfParticles(graphVersion) &&
           shape.dim(2).size() == GetNumberOfFeatures(graphVersion)))
-      throw cms::Exception("DPFIsolation")
+      throw cms::Exception("DPFIsolationForHLT")
           << "number of inputs does not match the expected inputs for the given version";
   }
 
 private:
-  tensorflow::Tensor getPredictions(edm::Event& event, edm::Handle<TauCollection> taus) override {
+  tensorflow::Tensor getPredictions(edm::Event& event,
+                                    const edm::EventSetup& es,
+                                    edm::Handle<TauCollection> taus) override {
     edm::Handle<pat::PackedCandidateCollection> pfcands;
     event.getByToken(pfcandToken_, pfcands);
 
@@ -394,4 +396,4 @@ private:
 };
 
 #include "FWCore/Framework/interface/MakerMacros.h"
-DEFINE_FWK_MODULE(DPFIsolation);
+DEFINE_FWK_MODULE(DPFIsolationForHLT);

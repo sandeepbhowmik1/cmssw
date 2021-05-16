@@ -5,12 +5,11 @@
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/TauReco/interface/PFTauFwd.h"
 
-class RecoTauCleanerPluginHGCalWorkaround : public reco::tau::RecoTauCleanerPlugin 
-{
- public:
+class RecoTauCleanerPluginHGCalWorkaround : public reco::tau::RecoTauCleanerPlugin {
+public:
   explicit RecoTauCleanerPluginHGCalWorkaround(const edm::ParameterSet& cfg, edm::ConsumesCollector&& cc);
-  ~RecoTauCleanerPluginHGCalWorkaround() override {}
-  
+  ~RecoTauCleanerPluginHGCalWorkaround() override = default;
+
   double operator()(const reco::PFTauRef& pfTau) const override;
 };
 
