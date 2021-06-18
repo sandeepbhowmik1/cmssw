@@ -77,9 +77,9 @@ def addDeepTauDiscriminator(process, hlt_srcPFTaus, hlt_srcPFJets, hlt_srcVertic
     ##deepTauSequence += process.hltSlimmedJets
 
     # CV: produce pat::Tau collection
-    if not hasattr(process, "genParticles"):
-        process.load("PhysicsTools.HepMCCandAlgos.genParticles_cfi")
-    deepTauSequence += process.genParticles
+    #if not hasattr(process, "genParticles"):
+    #    process.load("PhysicsTools.HepMCCandAlgos.genParticles_cfi")
+    #deepTauSequence += process.genParticles
 
     from PhysicsTools.PatAlgos.mcMatchLayer0.tauMatch_cfi import tauMatch
     moduleName_tauMatch = "hlt%sMatch%s" % (hlt_pfTauLabel, hlt_pfTauSuffix)
@@ -167,7 +167,6 @@ def addDeepTauDiscriminator(process, hlt_srcPFTaus, hlt_srcPFJets, hlt_srcVertic
     module_slimmedTaus = slimmedTaus.clone(
        src = cms.InputTag(moduleName_selectedPatTaus),
        packedPFCandidates = cms.InputTag('hltPackedPFCandidates'),
-        #dropPFSpecific = cms.bool(False)
     )
     setattr(process, moduleName_slimmedTaus, module_slimmedTaus)
     deepTauSequence += module_slimmedTaus
@@ -203,8 +202,6 @@ def addDeepTauDiscriminator(process, hlt_srcPFTaus, hlt_srcPFJets, hlt_srcVertic
       debug_level = cms.int32(0),
       disable_dxy_pca = cms.bool(True), 
       is_phase2HLT = cms.bool(True),
-      #debug_level = cms.int32 (2),
-      #save_inputs = cms.bool (True),
       disable_CellIndex_workaround = cms.bool(True),
       disable_FlightLengthSig_workaround = cms.bool(True),
     )

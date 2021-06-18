@@ -124,6 +124,7 @@ process.RECOoutput = cms.OutputModule("PoolOutputModule",
         'keep *_hltKT6PFJets_*_*',                  ## PRODUCED BELOW
         'keep *_hltPFMET*_*_*',                     ## PRODUCED BELOW
         'keep *_hltPuppiMET*_*_*',                  ## PRODUCED BELOW
+        'keep *_hltPackedPFCandidates*_*_*',        ## PRODUCED BELOW
         'keep *_prunedGenParticles_*_*',            ## PRESENT ONLY IN MINIAOD/RECO
         'keep *_ak4GenJets_*_*',                    ## PRESENT ONLY IN MINIAOD/RECO
         'keep *_ak8GenJets_*_*',                    ## PRESENT ONLY IN MINIAOD/RECO
@@ -208,6 +209,17 @@ for algorithm in [ "hps", "shrinking-cone" ]:
       process.taucustomreco += pftauSequence
 
 process.reconstruction_step += process.taucustomreco
+
+hlt_pfTauLabel = 'HpsPFTau'
+hlt_srcVertices = 'offlinePrimaryVertices'
+suffix = '8HitsMaxDeltaZWithOfflineVertices'
+from HLTrigger.Phase2HLTPFTaus.tools.addDeepTauDiscriminator import addDeepTauDiscriminator
+hlt_srcPFTaus = 'hltSelected%ss%s' % (hlt_pfTauLabel, suffix)
+hlt_srcPFJets = 'hlt%sAK4PFJets%s' % (hlt_pfTauLabel, suffix)
+deepTauSequenceName = "hltDeep%sSequence%s" % (hlt_pfTauLabel, suffix)
+deepTauSequence = addDeepTauDiscriminator(process, hlt_srcPFTaus, hlt_srcPFJets, hlt_srcVertices,
+        hlt_pfTauLabel, suffix, deepTauSequenceName)
+process.reconstruction_step += deepTauSequence
 
 # CV: add kt6PFJets for rho computation
 from RecoJets.JetProducers.kt6PFJets_cfi import kt6PFJets
